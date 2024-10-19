@@ -6,15 +6,21 @@ import AddProduct from './components/AddProduct';
 const App = () => {
   const [products, setProducts] = useState([]);
 
+  // Função para atualizar os produtos
+  const updateProducts = async () => {
+    const response = await fetchProducts();
+    setProducts(response.data);
+  };
+
   useEffect(() => {
-    fetchProducts().then((response) => setProducts(response.data));
+    updateProducts();  // Atualiza a lista ao carregar a página
   }, []);
 
   return (
     <div className="App">
       <h1>Product Management</h1>
-      <AddProduct setProducts={setProducts} />
-      <ProductList products={products} setProducts={setProducts} />
+      <AddProduct setProducts={setProducts} updateProducts={updateProducts} /> {/* Passando updateProducts */}
+      <ProductList products={products} setProducts={setProducts} updateProducts={updateProducts} /> {/* Passando updateProducts */}
     </div>
   );
 };

@@ -12,6 +12,37 @@ from db.base import Base
 from db.database import get_db
 
 
+from db.models import Produtos
+from schemas.produto import ProdutoUpdate
+
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
+def send_low_stock_email(produto):
+    sender_email = "92rafa@gmail.com"
+    receiver_email = "rafael.gareti@aluno.faculdadeimpacta.com.br"
+    password = "gzry xomu bcnk ravf"
+
+    message = MIMEMultipart("alternative")
+    message["Subject"] = f"Compra Necessária: {produto.item}"
+    message["From"] = sender_email
+    message["To"] = receiver_email
+
+    text = f"A quantidade do produto {produto.item} atingiu a quantidade mínima. Por favor, compre mais 100 unidades."
+    html = f"<p>A quantidade do produto <strong>{produto.item}</strong> atingiu a quantidade mínima. Por favor, compre mais 100 unidades.</p>"
+
+    part1 = MIMEText(text, "plain")
+    part2 = MIMEText(html, "html")
+
+    message.attach(part1)
+    message.attach(part2)
+
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+        server.login(sender_email, password)
+        server.sendmail(sender_email, receiver_email, message.as_string())
+
+
 #cria a tabela
 Base.metadata.create_all(bind=engine)
 router = APIRouter(prefix="/v1/api/produtos")
@@ -57,3 +88,44 @@ def update(id: int, request: ProdutoRequest, db: Session = Depends(get_db)):
         )
     produto = ProdutoRepository.save(db, ProdutosModel(id=id, **request.dict()))
     return ProdutoResponse.from_orm(produto)
+@router.put("/aumentar_caixas/{id}")
+def aumentar_caixas(id: int, quantidade: int, db: Session = Depends(get_db)):
+    produto = db.query( ProdutosModel).filter( ProdutosModel.id == id).first()
+    if not produto:
+        raise HTTPException(status_code=404, detail="Produto não encontrado")
+    produto.quantidade_estoque += quantidade
+    db.commit()
+    db.refresh(produto)
+    return {"message": "Caixas aumentadas com sucesso", "produto": produto}
+
+# @router.put("/diminuir_caixas/{id}")
+# def diminuir_caixas(id: int, quantidade: int, db: Session = Depends(get_db)):
+#     produto = db.query( ProdutosModel).filter( ProdutosModel.id == id).first()
+#     if not produto:
+#         raise HTTPException(status_code=404, detail="Produto não encontrado")
+#     if produto.quantidade_estoque - quantidade < 0:
+#         raise HTTPException(status_code=400, detail="Quantidade de caixas não pode ser negativa")
+#     produto.quantidade_estoque -= quantidade
+#     db.commit()
+#     db.refresh(produto)
+#     return {"message": "Caixas diminuídas com sucesso", "produto": produto}
+
+
+@router.put("/diminuir_caixas/{id}")
+def diminuir_caixas(id: int, quantidade: int, db: Session = Depends(get_db)):
+    produto = db.query(ProdutosModel).filter(ProdutosModel.id == id).first()
+    if not produto:
+        raise HTTPException(status_code=404, detail="Produto não encontrado")
+    
+    if produto.quantidade_estoque - quantidade < 0:
+        raise HTTPException(status_code=400, detail="Quantidade de caixas não pode ser negativa")
+    
+    produto.quantidade_estoque -= quantidade
+
+    # Verifica se a quantidade em estoque atingiu ou está abaixo da quantidade mínima
+    if produto.quantidade_estoque <= produto.quantidade_minima_estoque:
+        send_low_stock_email(produto)  # Envia o e-mail
+
+    db.commit()
+    db.refresh(produto)
+    return {"message": "Caixas diminuídas com sucesso", "produto": produto}

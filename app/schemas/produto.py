@@ -7,14 +7,15 @@ import re
 
 class Produtos(BaseModel):
     item: str
-    peso: float
-    numero_caixas: int
+    preco: float
+    quantidade_estoque: int
+    quantidade_minima_estoque: int
     id_setor: int
 
-    # @validator('peso')
-    # def validate_peso(cls, value):
+    # @validator('preco')
+    # def validate_preco(cls, value):
     #     if value <= 0:
-    #         raise ValueError('Peso Invalido')
+    #         raise ValueError('preco Invalido')
     #     return value
 
     # @validator('item')
@@ -26,18 +27,30 @@ class Produtos(BaseModel):
 
 class ProdutoRequest(Produtos):
     item: str
-    peso: float
-    numero_caixas: int
+    preco: float
+    quantidade_estoque: int
+    quantidade_minima_estoque: int
     id_setor: int
 
 
 class ProdutoResponse(Produtos):
     id: int
     item: str
-    peso: float
-    numero_caixas: int
+    preco: float
+    quantidade_estoque: int
+    quantidade_minima_estoque: int
     id_setor: int
 
     class Config:
-        from_attributes=True    
-        orm_mode = True
+        from_attributes=True
+
+class ProdutoUpdate(Produtos):
+    id: int
+    item: str
+    preco: float
+    quantidade_estoque: int
+    quantidade_minima_estoque: int
+    id_setor: int
+
+    class Config:
+        from_attributes=True

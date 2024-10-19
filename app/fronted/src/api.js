@@ -17,3 +17,13 @@ export const updateProduct = async (id, product) => {
 export const deleteProduct = async (id) => {
   return await axios.delete(`${API_URL}/delete/${id}`);
 };
+
+export const aumentarCaixas = async (id, quantidade) => {
+  return await axios.put(`${API_URL}/aumentar_caixas/${id}?quantidade=1`);
+};
+
+export const diminuirCaixas = async (id, quantidade) => {
+  return await axios.put(`${API_URL}/diminuir_caixas/${id}?quantidade=1`);
+};
+
+
