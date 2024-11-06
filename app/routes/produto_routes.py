@@ -2,10 +2,12 @@ from typing import List
 from fastapi import APIRouter, Response, Depends, status, Query, HTTPException
 from sqlalchemy.orm import Session
 from db.database import engine,SessionLocal, get_db
-from db.models import Produtos as ProdutosModel
-from schemas.produto import Produtos, ProdutoRequest, ProdutoResponse
+
+
 from sqlalchemy.orm import Session
 from repository.produto import ProdutoRepository
+from db.models import Produtos as ProdutosModel # Certifique-se de que o modelo SQLAlchemy está no arquivo models.py
+from schemas.produto import ProdutoRequest, ProdutoResponse  # Os esquemas Pydantic são importados aqui
 
 
 from db.base import Base
@@ -18,6 +20,8 @@ from schemas.produto import ProdutoUpdate
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+
+
 
 def send_low_stock_email(produto):
     sender_email = "92rafa@gmail.com"
@@ -129,3 +133,10 @@ def diminuir_caixas(id: int, quantidade: int, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(produto)
     return {"message": "Caixas diminuídas com sucesso", "produto": produto}
+
+@router.get("/produtos/{produto_id}/menor_preco")
+def get_menor_preco(produto_id: int, db: Session = Depends(get_db)):
+    fornecedor_com_menor_preco = find_menor_preco_por_produto(db, produto_id)
+    if fornecedor_com_menor_preco:
+        return fornecedor_com_menor_preco
+    return {"message": "Nenhum fornecedor encontrado para este produto"}

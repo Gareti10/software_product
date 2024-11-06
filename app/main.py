@@ -1,6 +1,8 @@
 from routes.produto_routes import router as produto_router
 from routes.setor_routes import router as setor_router
 from routes.usuario_routes import router as usuario_router
+from routes.fornecedor_routes import router as fornecedor_router
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
@@ -17,6 +19,7 @@ def health_check():
 app.include_router(setor_router)
 app.include_router(produto_router)
 app.include_router(usuario_router)
+app.include_router(fornecedor_router)
             # app.include_router(poc_routes)
 
 # app.include_router(user_routes)

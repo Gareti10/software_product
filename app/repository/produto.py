@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 
 from db.models import Produtos
+from db.models import ProdutoFornecedor
 
 class ProdutoRepository:
     @staticmethod
@@ -34,3 +35,10 @@ class ProdutoRepository:
         if produto is not None:
             db.delete(produto)
             db.commit()
+ 
+
+
+    # Função para encontrar o menor preço de um produto específico
+    @staticmethod
+    def find_menor_preco_por_produto(db: Session, produto_id: int):
+        return db.query(ProdutoFornecedor).filter(ProdutoFornecedor.produto_id == produto_id).order_by(ProdutoFornecedor.preco.asc()).first()

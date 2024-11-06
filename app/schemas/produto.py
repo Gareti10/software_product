@@ -1,56 +1,28 @@
 from pydantic import BaseModel
-from pydantic import validator
-import re
 
-#TODO criar pasta caso de uso
-# #Este arquivo ficam as regras de negócio
-
-class Produtos(BaseModel):
+# Modelo base para produto
+class ProdutoBase(BaseModel):
     item: str
     preco: float
     quantidade_estoque: int
     quantidade_minima_estoque: int
     id_setor: int
+    id_fornecedor: int  # Adiciona a referência ao fornecedor
 
-    # @validator('preco')
-    # def validate_preco(cls, value):
-    #     if value <= 0:
-    #         raise ValueError('preco Invalido')
-    #     return value
+# Esquema para criação de produto
+class ProdutoRequest(ProdutoBase):
+    pass
 
-    # @validator('item')
-    # def validate_item(cls, value):
-    #     if not re.match('^([a-z]|-|_)+$', value):
-    #         raise ValueError('Invalid item')
-    #     return value
-
-
-class ProdutoRequest(Produtos):
-    item: str
-    preco: float
-    quantidade_estoque: int
-    quantidade_minima_estoque: int
-    id_setor: int
-
-
-class ProdutoResponse(Produtos):
+# Esquema para resposta de produto
+class ProdutoResponse(ProdutoBase):
     id: int
-    item: str
-    preco: float
-    quantidade_estoque: int
-    quantidade_minima_estoque: int
-    id_setor: int
 
     class Config:
-        from_attributes=True
+        from_attributes = True
 
-class ProdutoUpdate(Produtos):
+# Esquema para atualização de produto
+class ProdutoUpdate(ProdutoBase):
     id: int
-    item: str
-    preco: float
-    quantidade_estoque: int
-    quantidade_minima_estoque: int
-    id_setor: int
 
     class Config:
-        from_attributes=True
+        from_attributes = True

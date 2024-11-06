@@ -1,28 +1,56 @@
-import React, { useState, useEffect } from 'react';
-import { fetchProducts } from './api';
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import ProductList from './components/ProductList';
 import AddProduct from './components/AddProduct';
-
-const App = () => {
+import AddFornecedor from './components/AddFornecedor';
+import SetPrecoProduto from './components/SetPrecoProduto';
+import ListarFornecedores from './components/ListarFornecedores';
+import UpdateProduct from './components/UpdateProduct'; // Este é o componente
+useEffect(() => {
+  const loadProducts = async () => {
+    try {
+      const response = await fetchProducts();
+      setProducts(response.data); // Assumindo que a resposta contém os produtos em `data`
+    } catch (error) {
+      console.error("Erro ao carregar produtos:", error);
+    }
+  };
+  loadProducts();
+}, []);
+function App() {
   const [products, setProducts] = useState([]);
 
-  // Função para atualizar os produtos
-  const updateProducts = async () => {
-    const response = await fetchProducts();
-    setProducts(response.data);
+  // Função para atualizar a lista de produtos
+  const addNewProduct = (newProduct) => { // Renomeada para evitar conflito
+    setProducts((prevProducts) => [...prevProducts, newProduct]);
   };
 
-  useEffect(() => {
-    updateProducts();  // Atualiza a lista ao carregar a página
-  }, []);
-
   return (
-    <div className="App">
-      <h1>Product Management</h1>
-      <AddProduct setProducts={setProducts} updateProducts={updateProducts} /> {/* Passando updateProducts */}
-      <ProductList products={products} setProducts={setProducts} updateProducts={updateProducts} /> {/* Passando updateProducts */}
-    </div>
+    <Router>
+      <div className="App">
+        <h1>Sistema de Gerenciamento</h1>
+        {/* Links de navegação */}
+        <nav>
+          <ul>
+            <li><Link to="/produtos">Administração de Produtos</Link></li>
+            <li><Link to="/fornecedores">Cadastro de Fornecedores</Link></li>
+            <li><Link to="/precos">Definir Preço de Produtos</Link></li>
+            <li><Link to="/listar-fornecedores">Listar Fornecedores</Link></li>
+          </ul>
+        </nav>
+
+        {/* Definindo as Rotas */}
+        <Routes>
+          <Route path="/produtos" element={<ProductList products={products} addNewProduct={addNewProduct} />} />
+
+          <Route path="/fornecedores" element={<AddFornecedor />} />
+          <Route path="/precos" element={<SetPrecoProduto />} />
+          <Route path="/add-product" element={<AddProduct onAddProduct={addNewProduct} />} />
+          <Route path="/listar-fornecedores" element={<ListarFornecedores />} />
+        </Routes>
+      </div>
+    </Router>
   );
-};
+}
 
 export default App;

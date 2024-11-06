@@ -10,7 +10,7 @@ export const createProduct = async (product) => {
   return await axios.post(`${API_URL}/criar`, product);
 };
 
-export const updateProduct = async (id, product) => {
+export const addNewProduct  = async (id, product) => {
   return await axios.put(`${API_URL}/update/${id}`, product);
 };
 

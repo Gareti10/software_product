@@ -8,6 +8,7 @@ py -m venv .venv
 source .venv/bin/activate
 8. No Windows:
  py -m venv .venv ..venv\Scripts\activate
+ .venv\Scripts\activate
 9. pip install -r requirements_dev.txt
  
 # Exec
