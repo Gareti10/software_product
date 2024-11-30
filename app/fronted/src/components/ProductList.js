@@ -6,6 +6,14 @@ const ProductList = () => {
   const [products, setProducts] = useState([]);
   const [selectedProductId, setSelectedProductId] = useState("");
 
+  // Estados para os filtros
+  const [filters, setFilters] = useState({
+    item: "",
+    preco: "",
+    quantidade_estoque: "",
+    nome_setor: "",
+  });
+
   useEffect(() => {
     loadProducts();
   }, []);
@@ -13,7 +21,7 @@ const ProductList = () => {
   const loadProducts = async () => {
     try {
       const response = await fetchProducts();
-      setProducts(response.data); // Atualiza o estado com os produtos da API
+      setProducts(response.data);
       console.log('Produtos carregados:', response.data);
     } catch (error) {
       console.error('Erro ao carregar produtos:', error);
@@ -23,35 +31,91 @@ const ProductList = () => {
   const handleIncrease = async () => {
     if (selectedProductId) {
       await aumentarCaixas(selectedProductId, 1);
-      loadProducts(); // Recarrega a lista após a modificação
+      loadProducts();
     }
   };
 
   const handleDecrease = async () => {
     if (selectedProductId) {
       await diminuirCaixas(selectedProductId, 1);
-      loadProducts(); // Recarrega a lista após a modificação
+      loadProducts();
     }
+  };
+
+  // Função para filtrar os produtos
+  const filteredProducts = products.filter((product) => {
+    return (
+      (filters.item === "" || product.item.toLowerCase().includes(filters.item.toLowerCase())) &&
+      (filters.preco === "" || product.preco.toString().includes(filters.preco)) &&
+      (filters.quantidade_estoque === "" || product.quantidade_estoque.toString().includes(filters.quantidade_estoque)) &&
+      (filters.nome_setor === "" || product.nome_setor.toLowerCase().includes(filters.nome_setor.toLowerCase()))
+    );
+  });
+
+  // Atualizar filtros
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters({ ...filters, [name]: value });
   };
 
   return (
     <div>
       <h2>Product List</h2>
-      <AddProduct onAdd={loadProducts} /> {/* Atualiza a lista quando um novo produto é adicionado */}
+      <AddProduct onAdd={loadProducts} />
 
       <table>
         <thead>
           <tr>
-            <th>Item</th>
-            <th>Preço</th>
-            <th>Quantidade em Estoque</th>
+            <th>
+              Item
+              <br />
+              <input
+                type="text"
+                name="item"
+                value={filters.item}
+                onChange={handleFilterChange}
+                placeholder="Filtrar por Item"
+              />
+            </th>
+            <th>
+              Preço
+              <br />
+              <input
+                type="text"
+                name="preco"
+                value={filters.preco}
+                onChange={handleFilterChange}
+                placeholder="Filtrar por Preço"
+              />
+            </th>
+            <th>
+              Quantidade em Estoque
+              <br />
+              <input
+                type="text"
+                name="quantidade_estoque"
+                value={filters.quantidade_estoque}
+                onChange={handleFilterChange}
+                placeholder="Filtrar por Estoque"
+              />
+            </th>
             <th>Quantidade Mínima em Estoque</th>
-            <th>Nome do Setor</th>
+            <th>
+              Nome do Setor
+              <br />
+              <input
+                type="text"
+                name="nome_setor"
+                value={filters.nome_setor}
+                onChange={handleFilterChange}
+                placeholder="Filtrar por Setor"
+              />
+            </th>
             <th>ID do Fornecedor</th>
           </tr>
         </thead>
         <tbody>
-          {products.map((product) => (
+          {filteredProducts.map((product) => (
             <tr key={product.id}>
               <td>{product.item}</td>
               <td>{product.preco} reais</td>
