@@ -4,6 +4,7 @@ from db.database import get_db
 from repository.fornecedor import FornecedorRepository
 from schemas.fornecedor import FornecedorRequest, FornecedorResponse
 
+from schemas.produto_fornecedor import ProdutoFornecedorResponse, PrecoRequest
 router = APIRouter(prefix="/v1/api/fornecedores", tags=["Fornecedores"])
 
 
@@ -18,9 +19,13 @@ def list_fornecedores(db: Session = Depends(get_db)):
     return FornecedorRepository.get_all(db)
 
 # Rota para definir o preço de um produto pelo fornecedor
-@router.post("/fornecedores/{fornecedor_id}/produtos/{produto_id}/preco")
-def set_preco_produto(fornecedor_id: int, produto_id: int, preco: float, db: Session = Depends(get_db)):
+@router.post("/{fornecedor_id}/produtos/{produto_id}/preco", response_model=ProdutoFornecedorResponse)
+def set_preco_produto(fornecedor_id: int, produto_id: int, preco: PrecoRequest, db: Session = Depends(get_db)):
     fornecedor = FornecedorRepository.get_by_id(db, fornecedor_id)
     if not fornecedor:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Fornecedor não encontrado")
-    return FornecedorRepository.set_preco_produto(db, fornecedor_id, produto_id, preco)
+    
+    # Passando o valor de preco para o repositório
+    return FornecedorRepository.set_preco_produto(db, fornecedor_id, produto_id, preco.preco)
+
+

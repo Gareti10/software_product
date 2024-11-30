@@ -18,7 +18,7 @@ const SetPrecoProduto = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`http://127.0.0.1:8003/fornecedores/${data.fornecedor_id}/produtos/${data.produto_id}/preco`, {
+      await axios.post(`http://127.0.0.1:8003/v1/api/fornecedores/${data.fornecedor_id}/produtos/${data.produto_id}/preco`, {
         preco: data.preco
       });
       alert('Preço definido com sucesso!');

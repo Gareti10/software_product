@@ -6,6 +6,7 @@ import AddFornecedor from './components/AddFornecedor';
 import SetPrecoProduto from './components/SetPrecoProduto';
 import ListarFornecedores from './components/ListarFornecedores';
 import UpdateProduct from './components/UpdateProduct';
+import MelhorPreco from "./components/MelhorPreco"; // Importar o componente
 
 function App() {
   const [products, setProducts] = useState([]);
@@ -39,6 +40,7 @@ function App() {
             <li><Link to="/fornecedores">Cadastro de Fornecedores</Link></li>
             <li><Link to="/precos">Definir Preço de Produtos</Link></li>
             <li><Link to="/listar-fornecedores">Listar Fornecedores</Link></li>
+            <li><Link to="/melhor-preco">Buscar Melhor Preço</Link></li> {/* Nova entrada no menu */}
           </ul>
         </nav>
 
@@ -49,6 +51,7 @@ function App() {
           <Route path="/precos" element={<SetPrecoProduto />} />
           <Route path="/add-product" element={<AddProduct onAddProduct={addNewProduct} />} />
           <Route path="/listar-fornecedores" element={<ListarFornecedores />} />
+          <Route path="/melhor-preco" element={<MelhorPreco />} /> {/* Nova rota */}
         </Routes>
       </div>
     </Router>

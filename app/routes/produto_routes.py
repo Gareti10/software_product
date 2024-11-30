@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from repository.produto import ProdutoRepository
 from db.models import Produtos as ProdutosModel # Certifique-se de que o modelo SQLAlchemy está no arquivo models.py
 from schemas.produto import ProdutoRequest, ProdutoResponse  # Os esquemas Pydantic são importados aqui
-
+from repository.fornecedor import FornecedorRepository
 
 from db.base import Base
 from db.database import get_db
@@ -134,9 +134,10 @@ def diminuir_caixas(id: int, quantidade: int, db: Session = Depends(get_db)):
     db.refresh(produto)
     return {"message": "Caixas diminuídas com sucesso", "produto": produto}
 
-@router.get("/produtos/{produto_id}/menor_preco")
-def get_menor_preco(produto_id: int, db: Session = Depends(get_db)):
-    fornecedor_com_menor_preco = find_menor_preco_por_produto(db, produto_id)
-    if fornecedor_com_menor_preco:
-        return fornecedor_com_menor_preco
-    return {"message": "Nenhum fornecedor encontrado para este produto"}
+
+@router.get("/{produto_id}/menor_preco")
+def get_best_price(produto_id: int, db: Session = Depends(get_db)):
+    best_price = FornecedorRepository.get_best_price_for_item(db, produto_id)
+    if not best_price:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Produto não encontrado ou não há preços disponíveis.")
+    return best_price

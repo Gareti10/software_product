@@ -26,4 +26,8 @@ export const diminuirCaixas = async (id, quantidade) => {
   return await axios.put(`${API_URL}/diminuir_caixas/${id}?quantidade=1`);
 };
 
+// Busca o menor preço de um produto
+export const fetchMenorPreco = async (produtoId) => {
+  return await axios.get(`${API_URL}/${produtoId}/menor_preco`);
 
+};
