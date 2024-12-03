@@ -75,3 +75,4 @@ class FornecedorRepository:
                 "preco": result.preco
             }
         return None
+    
